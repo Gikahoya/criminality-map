@@ -2,7 +2,7 @@
 .env
 
 # Raw CSV data files (large, download from StatCan directly)
-backend/data/raw/*.csv
+backend/data/raw/
 
 # Python
 __pycache__/
