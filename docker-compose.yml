@@ -1,0 +1,51 @@
+services:
+
+  # --- PostgreSQL database ---
+  db:
+    image: postgres:16-alpine
+    container_name: jobmarket_db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"          # exposes DB to your host machine so you can connect locally
+    volumes:
+      - postgres_data:/var/lib/postgresql/data   # data persists across restarts
+
+  # --- pgAdmin (visual DB browser) ---
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: jobmarket_pgadmin
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"            # open http://localhost:5050 in your browser
+    depends_on:
+      - db
+
+  # --- FastAPI backend ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: jobmarket_backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app      # hot reload: code changes reflect immediately
+    depends_on:
+      - db
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:

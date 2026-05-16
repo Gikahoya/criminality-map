@@ -1,0 +1,30 @@
+# Environment variables — NEVER commit these
+.env
+
+# Raw CSV data files (large, download from StatCan directly)
+backend/data/raw/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+
+# Node / Next.js
+node_modules/
+.next/
+frontend/.env.local
+
+# Docker
+postgres_data/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
